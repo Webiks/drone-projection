@@ -9,22 +9,21 @@ import myProjection from './map/projection/';
 import MousePosition from 'ol/control/MousePosition.js';
 import {createStringXY} from 'ol/coordinate.js';
 import { transformMat2 } from 'gl-matrix/src/gl-matrix/vec2';
+import {log,logSeperator} from './utils/logs';
+import { imageHeight, imageWidth, imageExtent } from './map/index';
 
 const projection = myProjection();
-/*      proj4.defs('EPSG:27700', '+proj=tmerc +lat_0=49 +lon_0=-2 +k=0.9996012717 ' +
-'+x_0=400000 +y_0=-100000 +ellps=airy ' +
-'+towgs84=446.448,-125.157,542.06,0.15,0.247,0.842,-20.489 ' +
-'+units=m +no_defs');
-register(proj4);
 
-const position =  [32.47839, 35.00659, 32.47842, 35.00581];
+document.querySelector('.clear').addEventListener('click',() => {
+    document.querySelector('.logs').innerHTML = '';
+})
 
+//const imageWidth = 4864;
+//const imageHeight = 3648;
 
-*/
+//const imageExtent = [0,0,imageWidth,imageHeight];
 
-const imageExtent = [0,0,4864,3648];
-
-const [,,imageWidth,imageHeight] = imageExtent;
+//const [,,imageWidth,imageHeight] = imageExtent;
 
 const mousePositionControl = new MousePosition({
     coordinateFormat: createStringXY(4),
@@ -39,11 +38,11 @@ const mousePositionControl = new MousePosition({
 
 
 var map = new Map({
-    
+    // controls: defaultControls().extend([mousePositionControl]),
     layers: [
         new ImageLayer({
             source: new Static({
-                url: `./assets/surface.jpg`,
+                url: `./assets/trees.JPG`,
                 crossOrigin: '',
                 projection,
                 imageExtent
@@ -53,22 +52,23 @@ var map = new Map({
     target: 'map',
     view: new View({
         center: getCenter(imageExtent),
-        zoom: 12
+        zoom: 14
     })
 });
 
 map.on('click', evt => {
     const coordinates = evt.coordinates;
-    console.log('image pixels from event', evt.coordinate);
+    log('image pixels from event', evt.coordinate);
     // [lon,lat]
     // [x,y]
-    const x = evt.coordinate[0]; // imageWidth;
-    const y = evt.coordinate[1]; // imageHeight;
-    console.log('point send to transform', [x,y]);
-    const result = transform([x,y],'image:surface', 'EPSG:4326' );
+    const x = evt.coordinate[0]; 
+    const y = evt.coordinate[1];
+    log('point send to transform', [parseInt(x),parseInt(y)]);
+    const result = transform([x,y],'image:surface', 'EPSG:3857' );
 
-    const result2 = transform(result,'EPSG:4326', 'image:surface');
+    const result2 = transform(result,'EPSG:3857', 'image:surface');
    
-    console.log('working???',result2 );
+    log('working',result2 );
+    logSeperator();
 
 })

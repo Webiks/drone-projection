@@ -13,12 +13,29 @@
         position: absolute;
         top: 0;
         bottom: 0;
-        width: 100%;
+        width: 60vw;
+        display:inline-block;
+        border-right:1px solid black;
+      }
+      .logs-display{
+        position: absolute;
+        left: 60vw;
+        width:37vw;
+        height:100%;
+        padding:0 10px;
+        
       }
     </style>
   </head>
   <body>
     <div id="map"></div>
+    <div class="logs-display">
+        <h3>logs</h3>
+        <button class='clear'>clear</button>
+        <div class='logs'>
+
+        </div>
+    </div>
     <script src="./main.js"></script>
   </body>
 </html>
