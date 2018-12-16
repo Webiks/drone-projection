@@ -1,6 +1,5 @@
-import Projection from 'ol/proj/Projection';
-import { addProjection } from 'ol/proj';
-import { addCoordinateTransforms } from 'ol/proj';
+import Projection from 'ol/proj/projection';
+import proj from 'ol/proj';
 import { convertPixels, convertCoordinates} from './transform';
 import proj4 from 'proj4';
 import {log} from '../../utils/logs';
@@ -82,35 +81,45 @@ export default () => {
     const projection = new Projection({
         code: 'image:surface',
         extent: imageExtent,
-        units: 'm'
+        units: 'pixels'
     });
+
+    proj.addProjection(projection);
     
-    addProjection(projection);
-    
-    addCoordinateTransforms('EPSG:3857', projection,
-    // forward
-    coordinates => toPixels(coordinates[1], coordinates[0])
-    ,
-    // inverse
-    coordinates => fromPixels(coordinates[1], coordinates[0]),
-    
+    proj.addCoordinateTransforms(
+      'image:surface',
+      'EPSG:3857',
+      // forward
+    coordinates => {
+        console.log('from coordinates', coordinates);
+        return fromPixels(...coordinates);
+      },
+
+      coordinates => {
+        console.log('to coordinates', coordinates);
+        return toPixels(...coordinates);
+      }
+        // inverse
     );
     
-    function toPixels(lat,lon){
-       
-        const result = convertCoordinates(mapMatrix, lon , lat );
+    function toPixels(x, y){
+        const result = convertCoordinates(mapMatrix, x, y);
+        console.log(result, "blblblbl");
         const resultX = result[0] * imageWidth;
         const resultY = result[1] * imageHeight;
-        log('to pixel', lat, lon, resultX, resultY);
+
+        console.log('to pixel', x, y, resultX, resultY);
         return [resultX, resultY];
+        // return [0, 0]
     }
     
     function fromPixels(x,y){
         const valX = x / imageWidth;
-        const valY = y / imageHeight
+        const valY = y / imageHeight;
         const result = convertPixels(mapMatrix,valX,valY);
-        log('from pixel', x,y, result[0], result[1]);
+        console.log('from pixel', x,y, result[0], result[1]);
         return result;
+        // return [x, y]
     }
     
     return projection;
